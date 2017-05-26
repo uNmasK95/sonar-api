@@ -41,4 +41,7 @@ class Message
     'Needed user params on query'
   end
 
+  def self.missing_params
+    'Missing params zone or sensor'
+  end
 end

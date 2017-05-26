@@ -12,4 +12,15 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :zones do
+    resources :sensors
+  end
+
+  get '/reads', to: 'reads#index'
+
+  # comunication with sensors
+  post '/reads', to: 'reads#create'
+
+
+
 end

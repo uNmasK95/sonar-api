@@ -4,6 +4,7 @@ module ExceptionHandler
   # Define custom error subclasses - rescue catches `StandardErrors`
   class AuthenticationError < StandardError; end
   class AdminAuthenticationError < StandardError; end
+  class MissingParams < StandardError; end
   class MissingToken < StandardError; end
   class InvalidToken < StandardError; end
   class NeedUserParam < StandardError; end
@@ -13,6 +14,7 @@ module ExceptionHandler
     # Define custom handlers
     rescue_from ExceptionHandler::AuthenticationError, with: :unauthorized_request
     rescue_from ExceptionHandler::AdminAuthenticationError, with: :unauthorized_request
+    rescue_from ExceptionHandler::MissingParams, with: :unauthorized_request
     rescue_from ExceptionHandler::MissingToken, with: :four_twenty_two
     rescue_from ExceptionHandler::InvalidToken, with: :four_twenty_two
     rescue_from ExceptionHandler::NeedUserParam, with: :four_twenty_two

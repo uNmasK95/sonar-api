@@ -5,7 +5,19 @@ class ReadsController < ApplicationController
   # GET /sensors/1/reads
   def index
     # filter by last read_timestamp
-    @reads = Read.all
+    if not params[:timestamp].blank?
+      @reads = Read.where(
+          :zone => @zone,
+          :sensor => @sensor,
+          :timestamp => {'$gt' => params[:timestamp]}
+      )
+    else
+      @reads = Read.where(
+          :zone => @zone,
+          :sensor => @sensor
+      )
+    end
+
     json_response( @reads )
   end
 
@@ -13,10 +25,10 @@ class ReadsController < ApplicationController
   def create
     local_read_params = read_params
     @read = Read.create!(
-                    :zone => @zone,
-                    :sensor => @sensor,
-                    :value => local_read_params[:value],
-                    :timestamp => local_read_params[:timestamp]
+        :zone => @zone,
+        :sensor => @sensor,
+        :value => local_read_params[:value],
+        :timestamp => local_read_params[:timestamp]
     )
     json_response( @read )
   end

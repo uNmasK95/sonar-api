@@ -13,12 +13,17 @@ Rails.application.routes.draw do
   end
 
   resources :zones do
-    resources :sensors
+    resources :sensors do
+      # actions with sensors
+      post  '/state', to: 'simulator#change'
+      get   '/state', to: 'simulator#state'
+      post  '/timerate', to: 'simulator#timerate'
+    end
   end
 
   get '/reads', to: 'reads#index'
 
-  # comunication with sensors
+  # send read by sensor
   post '/reads', to: 'reads#create'
 
 

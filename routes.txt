@@ -1,0 +1,63 @@
+// Gerar adim inicial admin@gmail.com
+
+POST    /login { email, password }
+
+GET     /admin/users
+POST    /admin/users  { registar novos utilizadores por parte dos administradores }
+GET     /admin/users/:id
+PUT     /admin/users/:id
+DELETE  /admin/users/:id
+
+
+// Criar lines para a dashboard
+GET     /lines      //serizalizer a informação toda
+POST    /lines
+GET     /lines/:id
+PUT     /lines/:id
+DELETE  /lines/:id
+
+
+GET     /lines/:line_id/graphics
+POST    /lines/:line_id/graphics    { referencial "Last Day" verificar se já existem 3 grapficos}
+GET     /lines/:line_id/graphics/:id
+PUT     /lines/:line_id/graphics/:id
+DELETE  /lines/:line_id/graphics/:id
+
+
+POST    /lines/:line_id/graphics/:graphic_id/metrics {zonaID,sensorID}
+PUT     /lines/:line_id/graphics/:graphic_id/metrics/:id {zonaID,sensorID}
+DELETE  /lines/:line_id/graphics/:graphic_id/metrics/:id
+
+
+GET     /zones
+POST    /zones
+GET     /zones/:id
+PUT     /zones/:id
+DELETE  /zones/:id
+
+GET     /zones/:zone_id/sensors
+POST    /zones/:zone_id/sensors
+GET     /zones/:zone_id/sensors/:id
+PUT     /zones/:zone_id/sensors/:id         { verificar se existe uma alteração no hostname }
+DELETE  /zones/:zone_id/sensors/:id
+
+GET     /zones/:zone_id/sensors/:sensors_id/reads
+
+
+
+GET     /notifications
+
+
+
+# Post de Leituras por parte dos simuladores
+
+POST    /sensors/:id/reads
+
+
+
+
+# Sensor rest api
+
+# os simuladores vão manter estado? 
+# gem HTTParty
+POST    /register  { é enviado o sensor para qual ele vai enviar as leituras}

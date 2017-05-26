@@ -1,51 +1,54 @@
 class LinesController < ApplicationController
-  before_action :set_line, only: [:show, :update, :destroy]
+  before_action :set_user
+  before_action :set_line, only: [ :show, :update, :destroy ]
 
   # GET /lines
   def index
-    @lines = Line.all
-
-    render json: @lines
+    @lines = @user.lines
+    json_response( @lines )
   end
 
   # GET /lines/1
   def show
-    render json: @line
+    json_response( @line )
   end
 
   # POST /lines
   def create
-    @line = Line.new(line_params)
-
-    if @line.save
-      render json: @line, status: :created, location: @line
-    else
-      render json: @line.errors, status: :unprocessable_entity
-    end
+    @line = @user.lines.create!( line_params )
+    json_response( @line )
   end
 
-  # PATCH/PUT /lines/1
+  # PUT /lines/1
   def update
-    if @line.update(line_params)
-      render json: @line
+    if @line.update(user_params)
+      json_response( @line )
     else
-      render json: @line.errors, status: :unprocessable_entity
-    end
-  end
+      json_response( @line.errors, :unprocessable_entity )
+    end  end
 
   # DELETE /lines/1
   def destroy
     @line.destroy
+    head :no_content
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_line
-      @line = Line.find(params[:id])
-    end
 
-    # Only allow a trusted parameter "white list" through.
-    def line_params
-      params.fetch(:line, {})
+  def set_user
+    if params[:user].blank?
+      raise(ExceptionHandler::NeedUserParam, Message.need_user_params)
+    else
+      @user = User.find(params[:user])
     end
+  end
+
+  def set_line
+    @line = @user.lines.find(params[:id])
+  end
+
+  def line_params
+    params.permit(:name)
+  end
+
 end

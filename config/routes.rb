@@ -1,8 +1,15 @@
 Rails.application.routes.draw do
 
-  resources :users do 
-    end
-  
+  post '/login', to: 'authentication#authenticate'
 
-  # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
+  namespace :admin do
+    resources :users
+  end
+
+  resources :lines do
+    resources :graphics do
+      resources :metrics , :only => [:create, :update, :destroy]
+    end
+  end
+
 end

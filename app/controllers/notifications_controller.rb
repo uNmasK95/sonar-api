@@ -1,27 +1,38 @@
 class NotificationsController < ApplicationController
 
-  before_action :set_notification, only: [ :update ]
+  before_action :set_notification, :set_user, only: [ :update ]
 
   # GET /notifications
   def index
     # filter by last notification_timestamp and user
-    if not params[:timestamp].blank?
+    if not params[:timestamp].blank? and not params[:user].blank?
       @notifications = Notification.where(
-          :timestamp => {'$gt' => params[:timestamp]}
+          :timestamp => {'$gt' => params[:timestamp]},
+          :user_ids => {'$nin' => [ @user.id ] }
+      )
+    elsif not params[:timestamp].blank?
+      @notifications = Notification.where(
+          :timestamp => {'$gt' => params[:timestamp]},
+      )
+    elsif
+      set_user
+      @notifications = Notification.where(
+          :user_ids => {'$nin' => [ @user.id ] }
       )
     else
       @notifications = Notification.all
     end
+
     json_response( @notifications )
   end
 
-  # PUT /notifications/1
+  # PUT /notifications/1 # only add users
   def update
-    if @notification
-      json_response( @notification )
-    else
-      json_response( @notification.errors, :unprocessable_entity )
-    end
+    @notification.push( user_ids: @user.id )
+    @notification.save
+    set_notification
+    json_response( @notification )
+
   end
 
   private

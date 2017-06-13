@@ -79,4 +79,10 @@ class ReadsController < ApplicationController
     raise(ExceptionHandler::MissingParams, Message.missing_params ) unless ( params[:zone] and params[:sensor] )
   end
 
+  def is_admin
+    if not admin?
+      raise(ExceptionHandler::AdminAuthenticationError, Message.not_admin )
+    end
+  end
+  
 end

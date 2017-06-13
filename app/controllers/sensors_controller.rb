@@ -1,4 +1,8 @@
+require 'httparty'
+
 class SensorsController < ApplicationController
+  include HTTParty
+
   before_action :is_admin, only: [ :create, :update, :destroy ]
   before_action :set_zone
   before_action :set_sensor, only: [ :show, :update, :destroy ]
@@ -26,6 +30,9 @@ class SensorsController < ApplicationController
         latitude: local_sensors_params[:latitude],
         longitude: local_sensors_params[:longitude]
     )
+
+    register_sensor
+
     json_response( @sensor )
   end
 
@@ -56,6 +63,17 @@ class SensorsController < ApplicationController
   # Only allow a trusted parameter "white list" through.
   def sensor_params
     params.permit(:hostname, :name, :description, :min, :max, :latitude, :longitude)
+  end
+
+  def register_sensor
+    HTTParty.post(
+        @sensor.hostname + '/register',
+        body: {
+            url: 'http://' + request.env['REMOTE_ADDR'] + ':3000/reads',
+            zone: @zone.id.to_s,
+            sensor: @sensor.id.to_s,
+            rate: params[:rate] || 30,
+    })
   end
 
   def is_admin

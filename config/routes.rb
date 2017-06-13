@@ -21,6 +21,11 @@ Rails.application.routes.draw do
     end
   end
 
+  #turnOff
+  #turnOn
+  #state
+  #change rate
+
   get '/reads', to: 'reads#index'
 
   # send read by sensor

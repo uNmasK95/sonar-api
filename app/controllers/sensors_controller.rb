@@ -16,7 +16,16 @@ class SensorsController < ApplicationController
 
   # POST /zones/1/sensors
   def create
-    @sensor = @zone.sensors.create!(sensor_params)
+    local_sensors_params = sensor_params
+    @sensor = @zone.sensors.create!(
+        hostname: local_sensors_params[:hostname],
+        name: local_sensors_params[:name],
+        description: local_sensors_params[:description],
+        min: local_sensors_params[:min] || @zone.min,
+        max: local_sensors_params[:max] || @zone.max,
+        latitude: local_sensors_params[:latitude],
+        longitude: local_sensors_params[:longitude]
+    )
     json_response( @sensor )
   end
 

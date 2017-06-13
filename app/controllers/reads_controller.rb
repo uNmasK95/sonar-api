@@ -2,7 +2,7 @@ class ReadsController < ApplicationController
 
   before_action :check_params, :set_zone, :set_sensor
 
-  # GET /sensors/1/reads
+  # GET /reads
   def index
     # filter by last read_timestamp
     if not params[:timestamp].blank?
@@ -10,6 +10,14 @@ class ReadsController < ApplicationController
           :zone => @zone,
           :sensor => @sensor,
           :timestamp => {'$gt' => params[:timestamp]}
+      )
+    elsif not params[:window].blank?
+      hours = params[:window].to_i + 1
+      time_late =  Time.now.getutc.to_i - (hours*60*60)
+      @reads = Read.where(
+          :zone => @zone,
+          :sensor => @sensor,
+          :timestamp => {'$gt' => time_late}
       )
     else
       @reads = Read.where(
@@ -21,15 +29,17 @@ class ReadsController < ApplicationController
     json_response( @reads )
   end
 
-  # POST /sensors/1/reads
+  # POST /reads
   def create
     local_read_params = read_params
     @read = Read.create!(
-        :zone => @zone,
-        :sensor => @sensor,
-        :value => local_read_params[:value],
-        :timestamp => local_read_params[:timestamp]
+        zone: @zone,
+        sensor: @sensor,
+        value: local_read_params[:value],
+        timestamp: local_read_params[:timestamp]
     )
+
+    generate_notification if @read.value > @sensor.max || @read.value < @sensor.min
     json_response( @read )
   end
 
@@ -44,11 +54,29 @@ class ReadsController < ApplicationController
   end
 
   def read_params
-    params.permit(:zone, :sensors, :value, :timestamp )
+    params.permit(:zone, :sensor, :value, :timestamp )
+  end
+
+  def generate_notification
+    if @read.value > @sensor.max
+      message = 'Os valores de ruido estão a acima do valor estipulado'
+    elsif @read.value < @sensor.min
+      message = 'Os valores de ruido estão a baixo do valor estipulado'
+    end
+
+    Notification.create(
+        zone: @zone,
+        sensor: @sensor,
+        value: @read.value,
+        min: @sensor.min,
+        max: @sensor.max,
+        timestamp: Time.now.getutc.to_i,
+        description: message
+    )
   end
 
   def check_params
-    raise(ExceptionHandler::MissingParams, Message.missing_params ) unless ( params[:zone] && params[:sensor] )
+    raise(ExceptionHandler::MissingParams, Message.missing_params ) unless ( params[:zone] and params[:sensor] )
   end
 
 end

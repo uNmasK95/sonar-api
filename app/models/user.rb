@@ -9,7 +9,6 @@ class User
 
   embeds_many :lines
 
-
   validates_presence_of :email, :password, :on => :create
   validates_uniqueness_of :email
 end

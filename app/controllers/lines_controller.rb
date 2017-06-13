@@ -25,7 +25,8 @@ class LinesController < ApplicationController
       json_response( @line )
     else
       json_response( @line.errors, :unprocessable_entity )
-    end  end
+    end
+  end
 
   # DELETE /lines/1
   def destroy

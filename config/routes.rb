@@ -26,6 +26,7 @@ Rails.application.routes.draw do
   # send read by sensor
   post '/reads', to: 'reads#create'
 
+  resources :notifications, only: [ :update, :index ]
 
 
 end

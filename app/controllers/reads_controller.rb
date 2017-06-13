@@ -1,5 +1,5 @@
 class ReadsController < ApplicationController
-
+  before_action :is_admin, only: [ :create ]
   before_action :check_params, :set_zone, :set_sensor
 
   # GET /reads

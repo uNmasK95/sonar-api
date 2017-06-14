@@ -80,6 +80,8 @@ class ReadsController < ApplicationController
   end
 
   def is_admin
+
+    puts @current_user
     if not admin?
       raise(ExceptionHandler::AdminAuthenticationError, Message.not_admin )
     end

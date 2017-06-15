@@ -15,9 +15,11 @@ Rails.application.routes.draw do
   resources :zones do
     resources :sensors do
       # actions with sensors
-      post  '/state', to: 'simulator#change'
-      get   '/state', to: 'simulator#state'
-      post  '/timerate', to: 'simulator#timerate'
+      post  '/state', to: 'sensors#change' # ver como fazer esta modificação por causa do update
+      get   '/state', to: 'sensors#state'
+      post  '/turnOn', to: 'sensors#turnOn'
+      post  '/turnOff', to: 'sensors#turnOff'
+      post  '/timerate', to: 'sensors#timerate'
     end
   end
 

@@ -5,7 +5,7 @@ class SensorsController < ApplicationController
 
   before_action :is_admin, only: [ :create, :update, :destroy ]
   before_action :set_zone
-  before_action :set_sensor, only: [ :show, :update, :destroy ]
+  before_action :set_sensor, only: [ :show, :update, :destroy, :state, :timerate ]
 
   # GET /zones/1/sensors
   def index
@@ -49,6 +49,30 @@ class SensorsController < ApplicationController
   def destroy
     @sensor.destroy
     head :no_content
+  end
+
+  def state
+    response = HTTParty.get(@sensor.hostname + '/state')
+    json_response( response.body )
+  end
+
+  def timerate
+    response = HTTParty.post(
+      @sensor.hostname + '/rate',
+      body: {
+          rate: params[:rate] || 30,
+      })
+    json_response( response.body )
+  end
+
+  def turnOn
+    HTTParty.post(@sensor.hostname + '/turnOn',body: {})
+    json_response(response.body )
+  end
+
+  def turnOff
+    HTTParty.post(@sensor.hostname + '/turnOff',body: {})
+    json_response(response.body )
   end
 
   private

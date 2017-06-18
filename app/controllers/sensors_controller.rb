@@ -52,27 +52,43 @@ class SensorsController < ApplicationController
   end
 
   def state
-    response = HTTParty.get(@sensor.hostname + '/state')
-    json_response( response.body )
+    begin
+      response = HTTParty.get(@sensor.hostname + '/state')
+      json_response( response.body )
+    rescue HTTParty::Error
+      json_response( { state: 'error' } , 404)
+    end
   end
 
   def timerate
-    response = HTTParty.post(
-      @sensor.hostname + '/rate',
-      body: {
-          rate: params[:rate] || 30,
-      })
-    json_response( response.body )
+    begin
+      response = HTTParty.post(
+        @sensor.hostname + '/rate',
+        body: {
+            rate: params[:rate] || 30,
+        })
+      json_response( response.body )
+    rescue HTTParty::Error
+      json_response( { state: 'error' } , 404)
+    end
   end
 
   def turnOn
-    HTTParty.post(@sensor.hostname + '/turnOn',body: {})
-    json_response(response.body )
+    begin
+      HTTParty.post(@sensor.hostname + '/turnOn',body: {})
+      json_response(response.body )
+    rescue HTTParty::Error
+      json_response( { state: 'error' } , 404)
+    end
   end
 
   def turnOff
-    HTTParty.post(@sensor.hostname + '/turnOff',body: {})
-    json_response(response.body )
+    begin
+      HTTParty.post(@sensor.hostname + '/turnOff',body: {})
+      json_response(response.body )
+    rescue HTTParty::Error
+      json_response( { state: 'error' } , 404)
+    end
   end
 
   private
@@ -90,14 +106,18 @@ class SensorsController < ApplicationController
   end
 
   def register_sensor
-    HTTParty.post(
-        @sensor.hostname + '/register',
-        body: {
-            url: 'http://' + request.env['REMOTE_ADDR'] + ':3000/reads',
-            zone: @zone.id.to_s,
-            sensor: @sensor.id.to_s,
-            rate: params[:rate] || 30,
-    })
+    begin
+      HTTParty.post(
+          @sensor.hostname + '/register',
+          body: {
+              url: 'http://' + request.env['REMOTE_ADDR'] + ':3000/reads',
+              zone: @zone.id.to_s,
+              sensor: @sensor.id.to_s,
+              rate: params[:rate] || 5,
+      })
+    rescue HTTParty::Error
+      json_response( { state: 'cant conect to hostname' } , 404)
+    end
   end
 
   def is_admin

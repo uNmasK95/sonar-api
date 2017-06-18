@@ -56,6 +56,6 @@ class MetricsController < ApplicationController
   end
 
   def metric_params
-    params.permit(:name, :rangeTime)
+    params.permit(:name, :zone, :sensor)
   end
 end

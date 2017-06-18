@@ -19,6 +19,15 @@ class ReadsController < ApplicationController
           :sensor => @sensor,
           :timestamp => {'$gt' => time_late}
       )
+    elsif not params[:frist].blank? and not params[:last].blank?
+      @reads = Read.where(
+          :zone => @zone,
+          :sensor => @sensor,
+          :timestamp => {
+              '$gte' => params[:frist],
+              '$lte' => params[:last]
+          }
+      )
     else
       @reads = Read.where(
           :zone => @zone,

@@ -8,7 +8,7 @@ Rails.application.routes.draw do
 
   resources :lines do
     resources :graphics do
-      resources :metrics , :only => [:create, :update, :destroy]
+      resources :metrics
     end
   end
 

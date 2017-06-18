@@ -15,7 +15,14 @@ class MetricsController < ApplicationController
 
   # POST /metrics
   def create
-    @metric = @graphic.metrics.create!( metric_params )
+    local_metrics_params = metric_params
+    @zone = Zone.find(local_metrics_params[:zone])
+    @sensor = @zone.sensors.find(local_metrics_params[:sensor])
+    @metric = @graphic.metrics.create!(
+        zone: @zone,
+        sensor: @sensor,
+        name: local_metrics_params[:name]
+    )
     json_response( @metric )
   end
 

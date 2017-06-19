@@ -47,10 +47,10 @@ class SensorsController < ApplicationController
     if @sensor.update( sensor_params )
       turnOff if not local_sensor_params[:hostname].blank?
       response_register = register_sensor
-      if response_register == nil
-        json_response({ sensor: @sensor, state: 'cant conect to hostname' } , 404)
-      end
-      json_response({ sensor: @sensor, state: response_register }) unless response_register != nil
+      # if response_register == nil
+      #   json_response({ sensor: @sensor, state: 'cant conect to hostname' } , 404)
+      # end
+      json_response({ sensor: @sensor, state: response_register }) #unless response_register != nil
     else
       json_response( @sensor.errors, :unprocessable_entity )
     end

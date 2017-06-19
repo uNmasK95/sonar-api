@@ -5,7 +5,8 @@ class SensorsController < ApplicationController
 
   before_action :is_admin, only: [ :create, :update, :destroy ]
   before_action :set_zone
-  before_action :set_sensor, only: [ :show, :update, :destroy, :state, :timerate ]
+  before_action :set_sensor, only: [ :show, :update, :destroy ]
+  before_action :set_sensor_id, only: [ :state, :turnOn, :turnOff, :timerate ]
 
   # GET /zones/1/sensors
   def index
@@ -30,16 +31,26 @@ class SensorsController < ApplicationController
         latitude: local_sensors_params[:latitude],
         longitude: local_sensors_params[:longitude]
     )
+    response_register = register_sensor
+    if response_register != nil
+      json_response({ sensor: @sensor, state: response_register })
+    else
+      @sensor.destroy
+      json_response({ sensor: @sensor, state: 'cant conect to hostname' } , 404)
+    end
 
-    register_sensor
-
-    json_response( @sensor )
   end
 
   # PATCH/PUT /zones/1/sensors/1
   def update
-    if @sensor.update(sensor_params)
-      json_response( @sensor )
+    local_sensor_params = sensor_params
+    if @sensor.update( sensor_params )
+      turnOff if not local_sensor_params[:hostname].blank?
+      response_register = register_sensor
+      if response_register == nil
+        json_response({ sensor: @sensor, state: 'cant conect to hostname' } , 404)
+      end
+      json_response({ sensor: @sensor, state: response_register }) unless response_register != nil
     else
       json_response( @sensor.errors, :unprocessable_entity )
     end
@@ -55,8 +66,8 @@ class SensorsController < ApplicationController
     begin
       response = HTTParty.get(@sensor.hostname + '/state')
       json_response( response.body )
-    rescue HTTParty::Error
-      json_response( { state: 'error' } , 404)
+    rescue Errno::ECONNREFUSED
+      json_response( { state: 'error on state' } , 404)
     end
   end
 
@@ -68,26 +79,26 @@ class SensorsController < ApplicationController
             rate: params[:rate] || 30,
         })
       json_response( response.body )
-    rescue HTTParty::Error
-      json_response( { state: 'error' } , 404)
+    rescue Errno::ECONNREFUSED
+      json_response( { state: 'error on timerate' } , 404)
     end
   end
 
   def turnOn
     begin
-      HTTParty.post(@sensor.hostname + '/turnOn',body: {})
+      response = HTTParty.post(@sensor.hostname + '/turnOn',body: {})
       json_response(response.body )
-    rescue HTTParty::Error
-      json_response( { state: 'error' } , 404)
+    rescue Errno::ECONNREFUSED
+      json_response( { state: 'error on turnOn' } , 404)
     end
   end
 
   def turnOff
     begin
-      HTTParty.post(@sensor.hostname + '/turnOff',body: {})
+      response = HTTParty.post(@sensor.hostname + '/turnOff',body: {})
       json_response(response.body )
-    rescue HTTParty::Error
-      json_response( { state: 'error' } , 404)
+    rescue Errno::ECONNREFUSED
+      json_response( { state: 'error on turnOff' } , 404)
     end
   end
 
@@ -100,6 +111,10 @@ class SensorsController < ApplicationController
     @sensor = @zone.sensors.find(params[:id])
   end
 
+  def set_sensor_id
+    @sensor = @zone.sensors.find(params[:sensor_id])
+  end
+
   # Only allow a trusted parameter "white list" through.
   def sensor_params
     params.permit(:hostname, :name, :description, :min, :max, :latitude, :longitude)
@@ -107,16 +122,17 @@ class SensorsController < ApplicationController
 
   def register_sensor
     begin
-      HTTParty.post(
+      response = HTTParty.post(
           @sensor.hostname + '/register',
           body: {
-              url: 'http://' + request.env['REMOTE_ADDR'] + ':3000/reads',
+              url: 'http://' + request.env['REMOTE_ADDR'] + ':3000',
               zone: @zone.id.to_s,
               sensor: @sensor.id.to_s,
               rate: params[:rate] || 5,
       })
-    rescue HTTParty::Error
-      json_response( { state: 'cant conect to hostname' } , 404)
+      return response.body
+    rescue Errno::ECONNREFUSED
+      return nil
     end
   end
 

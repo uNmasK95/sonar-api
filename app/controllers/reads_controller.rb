@@ -1,5 +1,5 @@
 class ReadsController < ApplicationController
-  before_action :is_admin, only: [ :create ]
+  before_action :is_sensor, only: [ :create ]
   before_action :check_params, :set_zone, :set_sensor
 
   # GET /reads
@@ -88,11 +88,9 @@ class ReadsController < ApplicationController
     raise(ExceptionHandler::MissingParams, Message.missing_params ) unless ( params[:zone] and params[:sensor] )
   end
 
-  def is_admin
-
-    puts @current_user
-    if not admin?
-      raise(ExceptionHandler::AdminAuthenticationError, Message.not_admin )
+  def is_sensor
+    if not sensor?
+      raise(ExceptionHandler::AdminAuthenticationError, Message.not_sensor )
     end
   end
   

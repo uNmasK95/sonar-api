@@ -15,6 +15,11 @@ class ApplicationController < ActionController::API
 
   # Check for admin authentication
   def admin?
-    @current_user.admin?
+    @current_user.user_type == 0
+  end
+
+  # Check for simulator authentication
+  def sensor?
+    @current_user.user_type == 2
   end
 end

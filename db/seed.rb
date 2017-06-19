@@ -1,0 +1,1 @@
+User.create!( {email: 'admin', password: 'admin', admin: true})

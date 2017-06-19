@@ -5,7 +5,7 @@ class User
   field :email, type: String
   field :password_digest, type: String
   has_secure_password
-  field :admin, type: Mongoid::Boolean, default: false
+  field :user_type, type: Integer, default: 1
 
   embeds_many :lines
 

@@ -44,4 +44,8 @@ class Message
   def self.missing_params
     'Missing params zone or sensor'
   end
+
+  def self.not_sensor
+    'Needed sensor credentials'
+  end
 end

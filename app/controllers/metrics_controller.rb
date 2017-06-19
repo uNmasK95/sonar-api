@@ -59,7 +59,7 @@ class MetricsController < ApplicationController
   end
 
   def set_metric
-    @graphic = @graphic.metrics.find(params[:id])
+    @metric = @graphic.metrics.find(params[:id])
   end
 
   def metric_params

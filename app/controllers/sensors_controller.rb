@@ -32,12 +32,12 @@ class SensorsController < ApplicationController
         longitude: local_sensors_params[:longitude]
     )
     response_register = register_sensor
-    if response_register != nil
+    # if response_register != nil
       json_response({ sensor: @sensor, state: response_register })
-    else
-      @sensor.destroy
-      json_response({ sensor: @sensor, state: 'cant conect to hostname' } , 404)
-    end
+    # else
+    #   @sensor.destroy
+    #   json_response({ sensor: @sensor, state: 'cant conect to hostname' } , 404)
+    # end
 
   end
 

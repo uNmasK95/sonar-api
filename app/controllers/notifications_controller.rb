@@ -14,7 +14,7 @@ class NotificationsController < ApplicationController
       @notifications = Notification.where(
           :timestamp => {'$gt' => params[:timestamp]},
       )
-    elsif
+    elsif not params[:user].blank?
       set_user
       @notifications = Notification.where(
           :user_ids => {'$nin' => [ @user.id ] }
@@ -44,7 +44,6 @@ class NotificationsController < ApplicationController
   def set_user
     @user = User.find(params[:user])
   end
-
 
   def notification_params
     params.permit(:zone, :sensor, :value, :timestamp, :description, :max, :min )

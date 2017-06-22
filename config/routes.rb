@@ -33,6 +33,6 @@ Rails.application.routes.draw do
   post '/reads', to: 'reads#create'
 
   resources :notifications, only: [ :update, :index ]
-
+  post '/notifications/seeall', to: 'notifications#updateAll'
 
 end

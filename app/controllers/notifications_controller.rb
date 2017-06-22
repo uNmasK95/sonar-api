@@ -1,6 +1,7 @@
 class NotificationsController < ApplicationController
+  before_action :set_notification, only: [ :update ]
+  before_action :set_user, only: [ :update, :updateAll]
 
-  before_action :set_notification, :set_user, only: [ :update ]
 
   # GET /notifications
   def index
@@ -32,9 +33,20 @@ class NotificationsController < ApplicationController
     @notification.save
     set_notification
     json_response( @notification )
-
   end
 
+  # PUT /notifications/1 # only add users
+  def updateAll
+    @notifications = Notification.where(
+        :user_ids => {'$nin' => [ @user.id ] }
+    )
+
+    @notifications.each { |notification|
+      notification.push( user_ids: @user.id )
+      notification.save
+    }
+    head :no_content
+  end
   private
 
   def set_notification
